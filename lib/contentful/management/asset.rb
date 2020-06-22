@@ -34,8 +34,9 @@ module Contentful
       def self.create_attributes(client, attributes)
         fields = attributes[:fields] || {}
         locale = attributes[:locale] || client.default_locale
-        fields[:title] = { locale => attributes[:title] } if attributes[:title]
-        fields[:description] = { locale => attributes[:description] } if attributes[:description]
+        default_locale = 'en-US'
+        fields[:title] = { locale => attributes[:title], default_locale => attributes[:title] } if attributes[:title]
+        fields[:description] = { locale => attributes[:description], default_locale => attributes[:description] } if attributes[:description]
         fields[:file] = { locale => attributes[:file].properties } if attributes[:file]
 
         { fields: fields }
@@ -50,16 +51,16 @@ module Contentful
       #
       # @return [Contentful::Management::Asset]
       def process_file
-        instance_variable_get(:@fields).keys.each do |locale|
+        # instance_variable_get(:@fields).keys.each do |locale|
           request = Request.new(
-            client,
-            process_url(locale),
-            {},
-            nil,
-            version: sys[:version]
+              client,
+              process_url(locale),
+              {},
+              nil,
+              version: sys[:version]
           )
           request.put
-        end
+        # end
         sys[:version] += 1
         self
       end
@@ -100,10 +101,10 @@ module Contentful
       # @return [String] Image API URL
       def image_url(options = {})
         query = {
-          w: options[:w] || options[:width],
-          h: options[:h] || options[:height],
-          fm: options[:fm] || options[:format],
-          q: options[:q] || options[:quality]
+            w: options[:w] || options[:width],
+            h: options[:h] || options[:height],
+            fm: options[:fm] || options[:format],
+            q: options[:q] || options[:quality]
         }.select { |_k, value| value }
 
         query.empty? ? file.url : "#{file.url}?#{URI.encode_www_form(query)}"
@@ -112,7 +113,8 @@ module Contentful
       protected
 
       def process_url(locale_code)
-        "spaces/#{space.id}/environments/#{environment_id}/assets/#{id}/files/#{locale_code}/process"
+        # "spaces/#{space.id}/environments/#{environment_id}/assets/#{id}/files/#{locale_code}/process"
+        "spaces/#{space.id}/environments/#{environment_id}/assets/#{id}/files/#{locale}/process"
       end
 
       def query_attributes(attributes)
@@ -120,7 +122,7 @@ module Contentful
         self.description = attributes[:description] || description
         self.file = attributes[:file] || file
 
-        { fields: fields_for_query }
+        {fields: fields_for_query}
       end
     end
   end

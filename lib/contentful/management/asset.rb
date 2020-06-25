@@ -34,12 +34,12 @@ module Contentful
       def self.create_attributes(client, attributes)
         fields = attributes[:fields] || {}
         locale = attributes[:locale] || client.default_locale
-        default_locale = 'en-US'
-        fields[:title] = { locale => attributes[:title], default_locale => attributes[:title] } if attributes[:title]
-        fields[:description] = { locale => attributes[:description], default_locale => attributes[:description] } if attributes[:description]
-        fields[:file] = { locale => attributes[:file].properties } if attributes[:file]
+        default_locale = client.default_locale
+        fields[:title] = {locale => attributes[:title], default_locale => attributes[:title]} if attributes[:title]
+        fields[:description] = {locale => attributes[:description], default_locale => attributes[:description]} if attributes[:description]
+        fields[:file] = {locale => attributes[:file].properties} if attributes[:file]
 
-        { fields: fields }
+        {fields: fields}
       end
 
       # @private
@@ -52,6 +52,7 @@ module Contentful
       # @return [Contentful::Management::Asset]
       def process_file
         # instance_variable_get(:@fields).keys.each do |locale|
+        begin
           request = Request.new(
               client,
               process_url(locale),
@@ -60,9 +61,13 @@ module Contentful
               version: sys[:version]
           )
           request.put
-        # end
-        sys[:version] += 1
-        self
+          # end
+          sys[:version] += 1
+          self
+        rescue Contentful::Management::Conflict, Contentful::Management::BadRequest
+          puts "Asset '#{id}' already processed! Maybe duplicated on your db, skipping...."
+          self
+        end
       end
 
       # Returns currently supported locale or default locale.
@@ -124,6 +129,11 @@ module Contentful
 
         {fields: fields_for_query}
       end
+
+      def output(text = nil)
+        Support.output(text, @quiet)
+      end
+
     end
   end
 end

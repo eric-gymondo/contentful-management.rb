@@ -51,7 +51,7 @@ module Contentful
         gzip_encoded: false,
         logger: false,
         log_level: Logger::INFO,
-        raise_errors: false,
+        raise_errors: true,
         dynamic_entries: {},
         disable_content_type_caching: false,
         proxy_host: nil,

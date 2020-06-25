@@ -64,7 +64,7 @@ module Contentful
           # end
           sys[:version] += 1
           self
-        rescue Contentful::Management::Conflict, Contentful::Management::BadRequest
+        rescue Contentful::Management::Conflict, Contentful::Management::BadRequest, Contentful::Management::ServerError
           puts "Asset '#{id}' already processed! Maybe duplicated on your db, skipping...."
           self
         end

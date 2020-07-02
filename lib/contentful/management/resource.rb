@@ -64,11 +64,13 @@ module Contentful
         headers = headers.merge(update_headers)
 
         ResourceRequester.new(client, self.class).update(
-          self,
-          update_url_attributes,
-          query_attributes(attributes),
-          headers
+            self,
+            update_url_attributes,
+            query_attributes(attributes),
+            headers
         )
+      rescue Contentful::Management::Conflict
+        puts "Conflict '#{id}' already processed! skipping...."
       end
 
       # Creates or updates a resource.

@@ -73,6 +73,8 @@ module Contentful
         puts "Conflict '#{id}' already processed! skipping...."
       end
 
+
+
       # Creates or updates a resource.
       #
       # @return [Contentful::Management::Resource]

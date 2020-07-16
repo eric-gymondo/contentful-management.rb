@@ -34,11 +34,10 @@ module Contentful
       def self.create_attributes(client, attributes)
         fields = attributes[:fields] || {}
         locale = attributes[:locale] || client.default_locale
-        # default_locale = client.default_locale
-        default_locale = 'de-DE'
-        fields[:title] = {locale => attributes[:title], default_locale => attributes[:title]} if attributes[:title]
-        fields[:description] = {locale => attributes[:description], default_locale => attributes[:description]} if attributes[:description]
-        fields[:file] = {locale => attributes[:file].properties} if attributes[:file]
+        fallback_locale = client.default_locale == 'de-DE' ? 'en-US' : 'de-DE'
+        fields[:title] = {locale => attributes[:title], fallback_locale => attributes[:title]} if attributes[:title]
+        fields[:description] = {locale => attributes[:description], fallback_locale => attributes[:description]} if attributes[:description]
+        fields[:file] = {locale => attributes[:file].properties, fallback_locale => attributes[:file].properties} if attributes[:file]
 
         {fields: fields}
       end

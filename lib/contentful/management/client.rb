@@ -394,6 +394,10 @@ module Contentful
             sleep(reset_time * Random.new.rand(1.0..1.2))
             retry
           end
+        rescue Contentful::Management::BadGateway => bad_gateway_error
+          logger.info("bad gateway, doing retry") if logger
+          sleep(reset_time * Random.new.rand(1.0..1.2))
+          retry
 
           raise
         end
